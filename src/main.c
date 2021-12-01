@@ -14,22 +14,33 @@ static int init_table(t_table *table)
         table->philo[i].id = i;
         if (!(table->philo[i].fork_left = malloc(sizeof(pthread_mutex_t))))
             return (ERROR_MALLOC);
+
         //printf("%p\n", table->philo[i].fork_left);
 		pthread_mutex_init(table->philo[i].fork_left, NULL);
+
         //printf("id philo :%d  - id  fork left: %d\n", table->philo[i].id,i);
         i++;
-        table->philo->eats = malloc(sizeof(pthread_mutex_t));
-        if  (!table->philo->eats)
-            return (ERROR_MALLOC);
+       // table->philo[i]->eats = malloc(sizeof(pthread_mutex_t));
+        // if  (!table->philo->eats)
+        //     return (ERROR_MALLOC);
     }
-    pthread_mutex_init(table->philo[0].eats, NULL);  // initialisation mutex  du philo  0
+    // if  (table->nb_philo > 2 && table->nb_philo % 2 == 0)
+    // {
+    //     int x = 0;
+    //     while (x < table->nb_philo  /  2)
+    //     {
+    //         pthread_mutex_init(table->philo[x].eats, NULL); 
+    //     // pthread_mutex_init(table->philo[0].eats, NULL);  // initialisation mutex  du philo  0
+    //         x++;
+    //     }
+    // }
     i = 0;
     while (i < table->nb_philo)
     {
         if (i != 0)
         {
             table->philo[i].fork_right = table->philo[i - 1].fork_left;
-            table->philo[i].eats = table->philo[0].eats;  // on donne le mutex aux autres philo
+            //table->philo[i].eats = table->philo[0].eats;  // on donne le mutex aux autres philo
             //printf("id philo A  :%d  - id  fork right: %d\n", table->philo[i].id, i - 1);
         }
         else
@@ -63,32 +74,57 @@ static int     ft_parse_arg(char **av, t_table  *table)
 
 static void    *ft_start(void *void_philo)
 {
-
-        puts("NOOO");  
 	t_philo *philo;
     philo = (t_philo *)void_philo;
-	pthread_mutex_lock(philo->fork_left);
-	pthread_mutex_lock(philo->fork_right);
+    // printf("----id philo :%d - %p - %p\n", philo->id, philo->fork_left, philo->fork_right);
+    while (1) {
+        pthread_mutex_lock(philo->fork_right);
+        printf("left fork & id %d\n",  philo->id);
+        pthread_mutex_lock(philo->fork_left);
+        printf("right fork  & id %d\n",  philo->id);
 
-    printf("left fork & id %d\n",  philo->id);
-    printf("right fork  & id %d\n",  philo->id);
+        usleep(philo->table->time_to_eat * 10000);
+        //printf("ICI: %d\n",  philo->table->time_to_eat);
+        //pthread_mutex_lock(philo->eats);
+        printf("miom miom & id %d\n",  philo->id);
 
-    usleep(philo->table->time_to_eat * MILLISECOND);
-    printf("ICI: %d\n",  philo->table->time_to_eat);
-	pthread_mutex_lock(philo->eats);
-    printf("miom miom & id %d\n",  philo->id);
-
-	pthread_mutex_unlock(philo->fork_left);
-	pthread_mutex_unlock(philo->fork_right);
-	pthread_mutex_unlock(philo->eats);
+        pthread_mutex_unlock(philo->fork_right);
+        pthread_mutex_unlock(philo->fork_left);
+        //pthread_mutex_unlock(philo->eats);
+        usleep(philo->table->time_to_sleep * 5000);
+        printf("ron pshit & id %d\n",  philo->id);
+    }
 
     return (NULL);
 }
+
+static long long int	get_time(void)
+{
+    struct timeval  current_time;
+
+    gettimeofday(&current_time, NULL);
+	return (current_time.tv_sec*1000 + current_time.tv_usec/1000);
+}
+
+
+
+// static long long int	elapsed_time(void)
+// {
+// 	long long int  start_time;
+// 	long long int  end_time;
+
+// 	start_time = get_time();
+// 	end_time = get_time();
+// 	return (end_time - start_time);
+// }
+
 
 int main(int ac, char **av)
 {
     pthread_t threads[2];
     t_table *table;
+
+ft_printf("%16lld %s\n", 100000000, "toto");  //has eaten  /  print propre  et ms affichage 
 
     int i = 0;
     table = (t_table *)malloc(sizeof(t_table));
@@ -97,6 +133,7 @@ int main(int ac, char **av)
     ft_parse_arg(av, table);
     if (init_table(table) == ERROR)
         return (ERROR);
+	table->begin_time = get_time();
     while (i < table->nb_philo)
     {
         int ret;
@@ -117,10 +154,6 @@ int main(int ac, char **av)
     //(void)av;
     return (SUCCESS);
 }
-
-
-//  faire  fonction de time 
-// -> timestamp &&  elasped time (after - now)
 
 // faire  une  fonction de display de message  coolax
 
