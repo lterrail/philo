@@ -8,18 +8,26 @@ static long long int	get_time(void)
 	return (current_time.tv_sec*1000 + current_time.tv_usec/1000);
 }
 
+static long long int	elapsed_time(t_philo *philo)
+{
+	long long int  end_time;
+
+	end_time = get_time();
+	return (end_time - philo->table->begin_time);
+}
+
 static	void	ft_print_msg(t_philo *philo, int i)
 {
 	if (i == PRINT_FORK)
-		printf("%lld   %d has taken a fork\n", get_time(), philo->id);
+		printf("%12lld ms  %d has taken a fork\n", elapsed_time(philo), philo->id);
 	if (i == PRINT_EAT)
-		printf("%lld   %d is eating\n", get_time(), philo->id);
+		printf("%12lld ms  %d is eating\n", elapsed_time(philo), philo->id);
 	if (i == PRINT_SLEEP)
-		printf("%lld   %d is sleeping\n", get_time(), philo->id);
+		printf("%12lld ms  %d is sleeping\n", elapsed_time(philo), philo->id);
 	if (i == PRINT_THINK)
-		printf("%lld   %d is thinking\n", get_time(), philo->id);
+		printf("%12lld ms  %d is thinking\n", elapsed_time(philo), philo->id);
 	if (i == PRINT_DIED)
-		printf("%lld   %d died\n", get_time(), philo->id);
+		printf("%12lld ms  %d died\n", elapsed_time(philo), philo->id);
 }
 
 static int init_table(t_table *table)
@@ -34,6 +42,7 @@ static int init_table(t_table *table)
     while (i < table->nb_philo)
     {
         table->philo[i].id = i;
+        table->philo[i].last_meal = table->begin_time;
         if (!(table->philo[i].fork_left = malloc(sizeof(pthread_mutex_t))))
             return (ERROR_MALLOC);
 
@@ -78,6 +87,7 @@ static int init_table(t_table *table)
         table->philo[i].table = table;
         i++;
     }
+	table->begin_time = get_time();
     return (SUCCESS);
 }
 
@@ -99,44 +109,38 @@ static void    *ft_start(void *void_philo)
 	t_philo *philo;
     philo = (t_philo *)void_philo;
     // printf("----id philo :%d - %p - %p\n", philo->id, philo->fork_left, philo->fork_right);
-    while (1) {
+    while (get_time() >= (philo->table->time_to_die * MILLISECOND + philo->last_meal))
+    {
         pthread_mutex_lock(philo->fork_right);
 		ft_print_msg(philo, PRINT_FORK); /////
         	//printf("right fork & id %d\n",  philo->id);
         pthread_mutex_lock(philo->fork_left);
 		ft_print_msg(philo, PRINT_FORK);
         	//printf("left fork  & id %d\n",  philo->id);
-        usleep(philo->table->time_to_eat * 10000);
+		ft_print_msg(philo, PRINT_EAT);
+        philo->last_meal = get_time();
+        usleep(philo->table->time_to_eat * MILLISECOND);
         //printf("ICI: %d\n",  philo->table->time_to_eat);
         //pthread_mutex_lock(philo->eats);
         	//printf("miom miom & id %d\n",  philo->id);
-		ft_print_msg(philo, PRINT_EAT);
         pthread_mutex_unlock(philo->fork_right);
         pthread_mutex_unlock(philo->fork_left);
         //pthread_mutex_unlock(philo->eats);
-        usleep(philo->table->time_to_sleep * 5000);
-        	//printf("ron pshit & id %d\n",  philo->id);
 		ft_print_msg(philo, PRINT_SLEEP);
+        usleep(philo->table->time_to_sleep * MILLISECOND);
+        	//printf("ron pshit & id %d\n",  philo->id);
+		ft_print_msg(philo, PRINT_THINK);
     }
 
+    // philo->table->dead = id_philo
+    ft_print_msg(philo, PRINT_DIED);
     return (NULL);
 }
 
 
-// static long long int	elapsed_time(void)
-// {
-// 	long long int  start_time;
-// 	long long int  end_time;
-
-// 	start_time = get_time();
-// 	end_time = get_time();
-// 	return (end_time - start_time);
-// }
-
-
 int main(int ac, char **av)
 {
-    pthread_t threads[2];
+    pthread_t threads[4]; /// UN PROBLEMO SSS ACQUIIII
     t_table *table;
 
     //printf("%16lld %s\n", 100000000, "toto");  //has eaten  /  print propre  et ms affichage 
@@ -149,20 +153,32 @@ int main(int ac, char **av)
     ft_parse_arg(av, table);
     if (init_table(table) == ERROR)
         return (ERROR);
-    else
-		table->begin_time = get_time();
+    
+    //     //usleep(100*MILLISECOND);
+    // puts("BEFOOOORE");
+    // //detatch d'abord
+    // if ((pthread_detach(threads[0]) != 0))
+    //     return (ERROR);
+    // pthread_join(threads[0], NULL);
+    // puts("FREDO DEAD");
+
+
+    // premier thread qui check la mort de tous les joueurs 
     while (i < table->nb_philo)
     {
         ret = pthread_create(&(threads[i]), NULL, ft_start, &(table->philo[i]));
         if (ret != 0)
             return (ERROR);
-        usleep(10);
+        usleep(MILLISECOND); // a verifier si ok ou pas
         i++;
     }
-
     while (1)
     {
-        sleep(1);
+        if (table->is_dead > 0)
+        {
+            pthread_detach(threads[table->is_dead])
+            pthread_join
+        }
     }
     
     (void)ac;
@@ -173,3 +189,5 @@ int main(int ac, char **av)
 // faire  une condition  d'arret  de jeu (philo dead)
 
 // savoir si mutex eats
+
+// faire un thread de plus qui verifie l'etat de mort des philo
