@@ -1,27 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   ft_memmove.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: cnicolas <cnicolas@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/25 14:08:22 by cnicolas          #+#    #+#             */
-/*   Updated: 2021/11/25 14:08:25 by cnicolas         ###   ########.fr       */
+/*   Created: 2021/11/25 14:04:40 by cnicolas          #+#    #+#             */
+/*   Updated: 2021/11/25 14:04:41 by cnicolas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
-# define BUFFER_SIZE 30
-# include <unistd.h>
-# include <sys/types.h>
-# include <sys/uio.h>
-# include <fcntl.h>
-# include <stdlib.h>
-# define MAX_FD 1024
+#include "libft.h"
 
-char	*get_next_line(int fd);
-char	*returned_and_assign(char **save);
-char	*get_line(char *save);
-char	*get_save(char *save);
-#endif
+void	*ft_memmove(void *dst, const void *src, size_t len)
+{
+	if (dst == NULL && src == NULL)
+		return (NULL);
+	if (dst < src)
+		ft_memcpy(dst, src, len);
+	else
+		while (len--)
+			((unsigned char *)dst)[len] = ((unsigned char *)src)[len];
+	return (dst);
+}

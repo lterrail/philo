@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   fractol.h                                          :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: lterrail <lterrail@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/10/26 05:21:59 by lterrail          #+#    #+#             */
-/*   Updated: 2019/05/19 15:12:18 by lterrail         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef PHILO_H
 # define PHILO_H
 
@@ -28,6 +16,12 @@
 
 # define MILLISECOND                 1000
 # define NB_PHILO                    2
+
+# define PRINT_FORK                  0
+# define PRINT_EAT                   1
+# define PRINT_SLEEP                 2
+# define PRINT_THINK                 3
+# define PRINT_DIED                  4
 
 typedef struct      s_philo
 {

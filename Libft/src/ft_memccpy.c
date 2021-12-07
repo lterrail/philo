@@ -1,27 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   ft_memccpy.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: cnicolas <cnicolas@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/25 14:08:22 by cnicolas          #+#    #+#             */
-/*   Updated: 2021/11/25 14:08:25 by cnicolas         ###   ########.fr       */
+/*   Created: 2021/11/25 14:03:51 by cnicolas          #+#    #+#             */
+/*   Updated: 2021/11/25 14:03:52 by cnicolas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
-# define BUFFER_SIZE 30
-# include <unistd.h>
-# include <sys/types.h>
-# include <sys/uio.h>
-# include <fcntl.h>
-# include <stdlib.h>
-# define MAX_FD 1024
+#include "libft.h"
 
-char	*get_next_line(int fd);
-char	*returned_and_assign(char **save);
-char	*get_line(char *save);
-char	*get_save(char *save);
-#endif
+void	*ft_memccpy(void *dst, const void *src, int c, size_t n)
+{
+	unsigned char	*ddst;
+	unsigned char	*ssrc;
+	unsigned int	i;
+
+	ddst = (unsigned char *)dst;
+	ssrc = (unsigned char *)src;
+	i = 0;
+	while (i < n)
+	{
+		ddst[i] = ssrc[i];
+		if (ssrc[i] == (unsigned char)c)
+			return ((void *)&ddst[i + 1]);
+		i++;
+	}
+	return (NULL);
+}

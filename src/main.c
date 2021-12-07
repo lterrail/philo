@@ -1,5 +1,27 @@
 #include "philo.h"
 
+static long long int	get_time(void)
+{
+    struct timeval  current_time;
+
+    gettimeofday(&current_time, NULL);
+	return (current_time.tv_sec*1000 + current_time.tv_usec/1000);
+}
+
+static	void	ft_print_msg(t_philo *philo, int i)
+{
+	if (i == PRINT_FORK)
+		printf("%lld   %d has taken a fork\n", get_time(), philo->id);
+	if (i == PRINT_EAT)
+		printf("%lld   %d is eating\n", get_time(), philo->id);
+	if (i == PRINT_SLEEP)
+		printf("%lld   %d is sleeping\n", get_time(), philo->id);
+	if (i == PRINT_THINK)
+		printf("%lld   %d is thinking\n", get_time(), philo->id);
+	if (i == PRINT_DIED)
+		printf("%lld   %d died\n", get_time(), philo->id);
+}
+
 static int init_table(t_table *table)
 {
     int i;
@@ -18,7 +40,7 @@ static int init_table(t_table *table)
         //printf("%p\n", table->philo[i].fork_left);
 		pthread_mutex_init(table->philo[i].fork_left, NULL);
 
-        //printf("id philo :%d  - id  fork left: %d\n", table->philo[i].id,i);
+        //printf("---------id philo :%d  - id  fork left: %d\n", table->philo[i].id,i);
         i++;
        // table->philo[i]->eats = malloc(sizeof(pthread_mutex_t));
         // if  (!table->philo->eats)
@@ -41,12 +63,12 @@ static int init_table(t_table *table)
         {
             table->philo[i].fork_right = table->philo[i - 1].fork_left;
             //table->philo[i].eats = table->philo[0].eats;  // on donne le mutex aux autres philo
-            //printf("id philo A  :%d  - id  fork right: %d\n", table->philo[i].id, i - 1);
+            //printf("ici : id philo A  :%d  - id  fork right: %d\n", table->philo[i].id, i - 1);
         }
         else
         {
             table->philo[i].fork_right = table->philo[table->nb_philo - 1].fork_left;
-            //printf("id philo :%d  - id  fork right: %d\n", table->philo[i].id,table->nb_philo  -  1);
+            //printf("laaaa : id philo :%d  - id  fork right: %d\n", table->philo[i].id,table->nb_philo  -  1);
         }
         i++;
     }
@@ -79,33 +101,26 @@ static void    *ft_start(void *void_philo)
     // printf("----id philo :%d - %p - %p\n", philo->id, philo->fork_left, philo->fork_right);
     while (1) {
         pthread_mutex_lock(philo->fork_right);
-        printf("left fork & id %d\n",  philo->id);
+		ft_print_msg(philo, PRINT_FORK); /////
+        	//printf("right fork & id %d\n",  philo->id);
         pthread_mutex_lock(philo->fork_left);
-        printf("right fork  & id %d\n",  philo->id);
-
+		ft_print_msg(philo, PRINT_FORK);
+        	//printf("left fork  & id %d\n",  philo->id);
         usleep(philo->table->time_to_eat * 10000);
         //printf("ICI: %d\n",  philo->table->time_to_eat);
         //pthread_mutex_lock(philo->eats);
-        printf("miom miom & id %d\n",  philo->id);
-
+        	//printf("miom miom & id %d\n",  philo->id);
+		ft_print_msg(philo, PRINT_EAT);
         pthread_mutex_unlock(philo->fork_right);
         pthread_mutex_unlock(philo->fork_left);
         //pthread_mutex_unlock(philo->eats);
         usleep(philo->table->time_to_sleep * 5000);
-        printf("ron pshit & id %d\n",  philo->id);
+        	//printf("ron pshit & id %d\n",  philo->id);
+		ft_print_msg(philo, PRINT_SLEEP);
     }
 
     return (NULL);
 }
-
-static long long int	get_time(void)
-{
-    struct timeval  current_time;
-
-    gettimeofday(&current_time, NULL);
-	return (current_time.tv_sec*1000 + current_time.tv_usec/1000);
-}
-
 
 
 // static long long int	elapsed_time(void)
@@ -124,21 +139,21 @@ int main(int ac, char **av)
     pthread_t threads[2];
     t_table *table;
 
-ft_printf("%16lld %s\n", 100000000, "toto");  //has eaten  /  print propre  et ms affichage 
+    //printf("%16lld %s\n", 100000000, "toto");  //has eaten  /  print propre  et ms affichage 
 
     int i = 0;
+	int ret;
     table = (t_table *)malloc(sizeof(t_table));
 	if (!table)
 		return (ERROR_MALLOC);
     ft_parse_arg(av, table);
     if (init_table(table) == ERROR)
         return (ERROR);
-	table->begin_time = get_time();
+    else
+		table->begin_time = get_time();
     while (i < table->nb_philo)
     {
-        int ret;
-        
-        ret  =  pthread_create(&(threads[i]), NULL, ft_start, &(table->philo[i]));
+        ret = pthread_create(&(threads[i]), NULL, ft_start, &(table->philo[i]));
         if (ret != 0)
             return (ERROR);
         usleep(10);
@@ -155,10 +170,6 @@ ft_printf("%16lld %s\n", 100000000, "toto");  //has eaten  /  print propre  et m
     return (SUCCESS);
 }
 
-// faire  une  fonction de display de message  coolax
-
 // faire  une condition  d'arret  de jeu (philo dead)
-
-//  debugger forks
 
 // savoir si mutex eats

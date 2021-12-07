@@ -1,27 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   ft_strrchr.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: cnicolas <cnicolas@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/25 14:08:22 by cnicolas          #+#    #+#             */
-/*   Updated: 2021/11/25 14:08:25 by cnicolas         ###   ########.fr       */
+/*   Created: 2021/11/25 14:06:46 by cnicolas          #+#    #+#             */
+/*   Updated: 2021/11/25 14:06:47 by cnicolas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
-# define BUFFER_SIZE 30
-# include <unistd.h>
-# include <sys/types.h>
-# include <sys/uio.h>
-# include <fcntl.h>
-# include <stdlib.h>
-# define MAX_FD 1024
+#include "libft.h"
 
-char	*get_next_line(int fd);
-char	*returned_and_assign(char **save);
-char	*get_line(char *save);
-char	*get_save(char *save);
-#endif
+char	*ft_strrchr(const char *str, int c)
+{
+	int		i;
+
+	i = ft_strlen(str);
+	while (i >= 0)
+	{
+		if (str[i] == (unsigned char)c)
+			return ((char *)str + i);
+		i--;
+	}
+	return (NULL);
+}
