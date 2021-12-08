@@ -44,5 +44,10 @@ typedef struct      s_table
     long long int begin_time;
 }					t_table;
 
+long long int   get_time(void);
+long long int	elapsed_time(t_philo *philo);
+
+void	ft_print_msg(t_philo *philo, int i);
+
 
 #endif

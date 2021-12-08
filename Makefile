@@ -1,7 +1,7 @@
 NAME	= philo
 
-SRC	=	main.c
-		##init.c	
+SRC	=	main.c \
+		init.c	
 
 OBJ		= $(addprefix ./obj/,$(SRC:.c=.o))
 
