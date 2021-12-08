@@ -36,18 +36,20 @@ typedef struct      s_philo
 typedef struct      s_table
 {
     t_philo         *philo;
-    int nb_philo;
-    int time_to_die;
-    int time_to_eat;
-    int time_to_sleep;
-    int time_to_think;
-    long long int begin_time;
+    pthread_t       *threads;
+    int             nb_philo;
+    int             time_to_die;
+    int             time_to_eat;
+    int             time_to_sleep;
+    int             time_to_think;
+    long long int   begin_time;
 }					t_table;
 
 long long int   get_time(void);
 long long int	elapsed_time(t_philo *philo);
 
-void	ft_print_msg(t_philo *philo, int i);
+void            ft_print_msg(t_philo *philo, int i);
 
+int             ft_play(t_table *table);
 
 #endif
