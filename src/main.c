@@ -91,13 +91,24 @@ static int init_table(t_table *table)
     return (SUCCESS);
 }
 
-static int     ft_parse_arg(char **av, t_table  *table)
+static int     ft_parse_arg(char **av, int ac,  t_table  *table)
 {
+    if (ac < 5 || ac > 6)
+        return (ERROR);
     table->nb_philo = ft_atoi(av[1]);
     table->time_to_die = ft_atoi(av[2]);
     table->time_to_eat = ft_atoi(av[3]);
-    table->time_to_sleep = ft_atoi(av[4]); //  + argument  optionnel ?
-    if  (!table->nb_philo ||  !table->time_to_die ||  !table->time_to_eat ||  !table->time_to_sleep)
+    table->time_to_sleep = ft_atoi(av[4]);
+    if (ac == 6)
+    {
+        table->must_eat = ft_atoi(av[5]);
+        if (table->must_eat <= 0)
+            return (ERROR);
+    }
+    else
+        table->must_eat = INT_MAX;
+    if  (!table->nb_philo ||  !table->time_to_die ||  !table->time_to_eat ||  !table->time_to_sleep
+            || table->nb_philo < 2 || table->time_to_die <= 0 || table->time_to_eat <= 0 || table->time_to_sleep <= 0)
         return (ERROR); // si ca  peut  fail ?
     if  (table->nb_philo < 2)
         return (ERROR_USAGE);
@@ -109,7 +120,7 @@ static void    *ft_start(void *void_philo)
 	t_philo *philo;
     philo = (t_philo *)void_philo;
     // printf("----id philo :%d - %p - %p\n", philo->id, philo->fork_left, philo->fork_right);
-    while (get_time() >= (philo->table->time_to_die * MILLISECOND + philo->last_meal))
+    while (get_time() >= (philo->table->time_to_die * MILLISECOND + philo->last_meal) && philo->table->must_eat) /////
     {
         pthread_mutex_lock(philo->fork_right);
 		ft_print_msg(philo, PRINT_FORK); /////
@@ -118,6 +129,7 @@ static void    *ft_start(void *void_philo)
 		ft_print_msg(philo, PRINT_FORK);
         	//printf("left fork  & id %d\n",  philo->id);
 		ft_print_msg(philo, PRINT_EAT);
+        philo->table->must_eat--; ///// gerer si on envoie 0 comme argument
         philo->last_meal = get_time();
         usleep(philo->table->time_to_eat * MILLISECOND);
         //printf("ICI: %d\n",  philo->table->time_to_eat);
@@ -150,7 +162,8 @@ int main(int ac, char **av)
     table = (t_table *)malloc(sizeof(t_table));
 	if (!table)
 		return (ERROR_MALLOC);
-    ft_parse_arg(av, table);
+    if (ft_parse_arg(av, ac, table) == ERROR)
+        return (ERROR); // mettre une erreur usage
     if (init_table(table) == ERROR)
         return (ERROR);
     
@@ -171,18 +184,9 @@ int main(int ac, char **av)
             return (ERROR);
         usleep(MILLISECOND); // a verifier si ok ou pas
         i++;
+        pthread_detach(threads[i]);
     }
-    while (1)
-    {
-        if (table->is_dead > 0)
-        {
-            pthread_detach(threads[table->is_dead])
-            pthread_join
-        }
-    }
-    
-    (void)ac;
-    //(void)av;
+    while (1){}
     return (SUCCESS);
 }
 

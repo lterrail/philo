@@ -7,6 +7,7 @@
 # include <stdlib.h>
 # include <string.h>
 # include <pthread.h>
+# include <limits.h>
 # include "libft.h"
 
 # define SUCCESS		             1
@@ -42,6 +43,7 @@ typedef struct      s_table
     int time_to_sleep;
     int time_to_think;
     long long int begin_time;
+    int           must_eat;
 }					t_table;
 
 
