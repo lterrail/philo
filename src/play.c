@@ -1,6 +1,5 @@
 #include "philo.h"
 
-
 static void    *ft_start(void *void_philo)
 {
 	t_philo *philo;
@@ -22,6 +21,7 @@ static void    *ft_start(void *void_philo)
 		ft_print_msg(philo, PRINT_THINK);
     }
     ft_print_msg(philo, PRINT_DIED);
+    pthread_detach(philo->table->threads[philo->id]);
     return (NULL);
 }
 

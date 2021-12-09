@@ -60,24 +60,30 @@ static int     ft_parse_arg(int ac, char **av, t_table  *table)
     return (SUCCESS);
 }
 
-int main(int ac, char **av)
+int             main(int ac, char **av)
 {
     t_table *table;
 
     table = (t_table *)malloc(sizeof(t_table));
-	if (!table)
-		return (ERROR_MALLOC);
+    if (!table)
+    {
+        printf("Error\nMalloc failed\n");
+        return (ERROR);
+    }
     if (ft_parse_arg(ac, av, table) == ERROR)
     {
         printf("Error\n\tusage: ./philo [number_of_philosophers] [time_to_die] [time_to_eat] [time_to_sleep]\n");
-        return (ERROR_USAGE);
+        return (ERROR);
     }
     if (ft_init_table(table) == ERROR)
     {
         printf("Error\nMalloc failed\n");
-        return (ERROR_MALLOC);
+        return (ERROR);
     }
     if (ft_play(table) == ERROR)
+    {
+        printf("Error\nGame crashed\n");
         return (ERROR);
+    }
     return (SUCCESS);
 }
