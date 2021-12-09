@@ -29,23 +29,25 @@ typedef struct      s_philo
     int					id;
     pthread_mutex_t		*fork_left;
 	pthread_mutex_t		*fork_right;
-    pthread_mutex_t     *eats;
+    pthread_mutex_t     *eats; /// a changer
     long long int       last_meal;
-	pthread_t			*thread;
-    struct s_table      *table;
+    struct s_table		*table;
 }					t_philo;
 
 typedef struct      s_table
 {
-    t_philo         *philo;
-    int nb_philo;
-    int time_to_die;
-    int time_to_eat;
-    int time_to_sleep;
-    int time_to_think;
-    long long int begin_time;
-    int           must_eat;
+    t_philo			*philo;
+    int				nb_philo;
+    int				time_to_die;
+    int				time_to_eat;
+    int				time_to_sleep;
+    int				time_to_think;
+    long long int	begin_time;
+    int				must_eat;
     int				dead;
+	int				id_philo_who_just_died;
+	pthread_t		*threads;
+
 }					t_table;
 
 

@@ -30,17 +30,64 @@ static	void	ft_print_msg(t_philo *philo, int i)
 		printf("%12lld ms  %d died\n", elapsed_time(philo), philo->id);
 }
 
+static void	ft_print_error(int err)
+{
+	if (err == ERROR_MALLOC)
+		printf("Error\nError Malloc\n");
+	else if (err == ERROR_USAGE)
+		printf("Error\nError Usage : ./philo number_of_philosophers time_to_die time_to_eat \
+time_to_sleep [number_of_times_each_philosopher_must_eat]\n");
+	else if (err == ERROR)
+		printf("Error\n");
+}
+
+static void ft_quit(t_table *table, int err)
+{
+	int	i;
+
+	i = -1;
+	ft_print_error(err);
+	if (table)
+	{
+		if (table->philo)
+		{
+			while (++i < table->nb_philo)
+			{
+				if (table->philo[i].fork_left) ///ajouter les free ?
+				{
+					pthread_mutex_destroy(table->philo[i].fork_left);
+					free(table->philo[i].fork_left);
+				}
+			}
+			free(table->philo);
+		}
+		if (table->threads) ///////////////////////////////////////////////////////////
+		{
+			i = -1;
+			while (++i <= table->nb_philo)
+			{
+				pthread_detach(table->threads[i]); ///leaks aleatoires :regarder les conditions detach precedentes car ne devaient pas etre validees
+			}
+
+			free(table->threads);
+		}
+
+		free(table);
+	}
+}
+
 static int init_table(t_table *table)
 {
     int i;
-  //  pthread_t threads[5];
-    i = 0;
-    if  (!(table->philo->thread = (pthread_t *)malloc(sizeof(pthread_t) * table->nb_philo + 1))
-        return (ERROR_MALLOC);
+    i = -1;
+
     if (!(table->philo = (t_philo *)malloc(sizeof(t_philo) * table->nb_philo)))
-        return (ERROR_MALLOC);
+		return (ERROR_MALLOC);
+	if (!(table->threads = (pthread_t *)malloc(sizeof(pthread_t) * (table->nb_philo + 1))))
+		return (ERROR_MALLOC);
+	table->begin_time = get_time();  //begin time ne comme,ce pas donc les conditions suivantes ne vont pas ,le programme ne commence pas
     table->dead = 0;
-    while (i < table->nb_philo)
+    while (++i < table->nb_philo)
     {
         table->philo[i].id = i;
         table->philo[i].last_meal = table->begin_time;
@@ -50,8 +97,7 @@ static int init_table(t_table *table)
         //printf("%p\n", table->philo[i].fork_left);
 		pthread_mutex_init(table->philo[i].fork_left, NULL);
 
-        //printf("---------id philo :%d  - id  fork left: %d\n", table->philo[i].id,i);
-        i++;
+       // printf("---------id philo :%d  - id  fork left: %d\n", table->philo[i].id,i);
        // table->philo[i]->eats = malloc(sizeof(pthread_mutex_t));
         // if  (!table->philo->eats)
         //     return (ERROR_MALLOC);
@@ -66,8 +112,8 @@ static int init_table(t_table *table)
     //         x++;
     //     }
     // }
-    i = 0;
-    while (i < table->nb_philo)
+    i = -1;
+    while (++i < table->nb_philo)
     {
         if (i != 0)
         {
@@ -80,15 +126,13 @@ static int init_table(t_table *table)
             table->philo[i].fork_right = table->philo[table->nb_philo - 1].fork_left;
             //printf("laaaa : id philo :%d  - id  fork right: %d\n", table->philo[i].id,table->nb_philo  -  1);
         }
-        i++;
     }
-    i = 0;
-    while (i < table->nb_philo)
-    {
+    i = -1;
+    while (++i < table->nb_philo)
+	{
         table->philo[i].table = table;
-        i++;
-    }
-	table->begin_time = get_time();
+	}
+	table->id_philo_who_just_died = -1;
     return (SUCCESS);
 }
 
@@ -145,29 +189,34 @@ static void    *ft_start(void *void_philo)
 		ft_print_msg(philo, PRINT_THINK);
     }
     philo->table->dead++;
-    ft_print_msg(philo, PRINT_DIED);
+	philo->table->id_philo_who_just_died = philo->id;
+    // ft_print_msg(philo, PRINT_DIED);
     return (NULL);
 }
 
-static int     ft_check_death(t_table *table)
+static void     *ft_check_death(void *void_table)
 {
-    int detached;
-
-    if (elapsed_time(philo) > table->time_to_die * MILLISECOND)
+    t_table *table;
+    table = (t_table *)void_table;
+    while (1)
     {
-        detached = pthread_detach(thread[i]);
-        if (detached != 0)
-            return (ERROR);
-        return  (SUCCESS);
+		if (table->id_philo_who_just_died >= 0)
+		{
+			ft_print_msg(&(table->philo[table->id_philo_who_just_died]), PRINT_DIED);
+			// pthread_detach(table->threads[table->id_philo_who_just_died]);
+			table->id_philo_who_just_died = -1;
+		}
+		if (table->dead == table->nb_philo)
+		{
+			//pthread_detach(table->threads[table->nb_philo]); //LALALALA ///
+			return (NULL);
+		}
     }
-    return (SUCCESS);
 }
 
 int main(int ac, char **av)
 {
-    //pthread_t threads[5]; /// UN PROBLEMO SSS ACQUIIII
     t_table *table;
-
     //printf("%16lld %s\n", 100000000, "toto");  //has eaten  /  print propre  et ms affichage 
     int i = 0;
 	int ret;
@@ -175,27 +224,27 @@ int main(int ac, char **av)
 	if (!table)
 		return (ERROR_MALLOC);
     if (ft_parse_arg(av, ac, table) == ERROR)
-        return (ERROR); // mettre une erreur usage
+		return (ERROR); // mettre une erreur usage
     if (init_table(table) == ERROR)
         return (ERROR);
     // premier thread qui check la mort de tous les joueurs 
     while (i < table->nb_philo)
     {
-        ret = pthread_create(&(threads[i]), NULL, ft_start, &(table->philo[i]));
+        ret = pthread_create(&(table->threads[i]), NULL, ft_start, &(table->philo[i]));
         if (ret != 0)
             return (ERROR);
         // ret = pthread_detach(threads[i]);
         usleep(MILLISECOND); // a verifier si ok ou pas
         i++;
     }
-    int death = pthread_create(&(threads[table->nb_philo + 1]), NULL, ft_check_death, table);
-    if (death != 0)
+    int death = pthread_create(&(table->threads[table->nb_philo]), NULL, ft_check_death, table);
+	if (death != 0)
         return (ERROR);
     while (table->dead != table->nb_philo)
     {
         usleep(MILLISECOND);
     }
-
+	ft_quit(table, SUCCESS);
     return (SUCCESS);
 }
 
