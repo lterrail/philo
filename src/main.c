@@ -33,12 +33,13 @@ static	void	ft_print_msg(t_philo *philo, int i)
 static int init_table(t_table *table)
 {
     int i;
-
+  //  pthread_t threads[5];
     i = 0;
-    
+    if  (!(table->philo->thread = (pthread_t *)malloc(sizeof(pthread_t) * table->nb_philo + 1))
+        return (ERROR_MALLOC);
     if (!(table->philo = (t_philo *)malloc(sizeof(t_philo) * table->nb_philo)))
-        return (0);
-
+        return (ERROR_MALLOC);
+    table->dead = 0;
     while (i < table->nb_philo)
     {
         table->philo[i].id = i;
@@ -91,7 +92,7 @@ static int init_table(t_table *table)
     return (SUCCESS);
 }
 
-static int     ft_parse_arg(char **av, int ac,  t_table  *table)
+static int     ft_parse_arg(char **av, int ac, t_table *table)
 {
     if (ac < 5 || ac > 6)
         return (ERROR);
@@ -110,7 +111,7 @@ static int     ft_parse_arg(char **av, int ac,  t_table  *table)
     if  (!table->nb_philo ||  !table->time_to_die ||  !table->time_to_eat ||  !table->time_to_sleep
             || table->nb_philo < 2 || table->time_to_die <= 0 || table->time_to_eat <= 0 || table->time_to_sleep <= 0)
         return (ERROR); // si ca  peut  fail ?
-    if  (table->nb_philo < 2)
+    if  (table->nb_philo < 1)
         return (ERROR_USAGE);
     return (SUCCESS);
 }
@@ -143,20 +144,31 @@ static void    *ft_start(void *void_philo)
         	//printf("ron pshit & id %d\n",  philo->id);
 		ft_print_msg(philo, PRINT_THINK);
     }
-
-    // philo->table->dead = id_philo
+    philo->table->dead++;
     ft_print_msg(philo, PRINT_DIED);
     return (NULL);
 }
 
+static int     ft_check_death(t_table *table)
+{
+    int detached;
+
+    if (elapsed_time(philo) > table->time_to_die * MILLISECOND)
+    {
+        detached = pthread_detach(thread[i]);
+        if (detached != 0)
+            return (ERROR);
+        return  (SUCCESS);
+    }
+    return (SUCCESS);
+}
 
 int main(int ac, char **av)
 {
-    pthread_t threads[4]; /// UN PROBLEMO SSS ACQUIIII
+    //pthread_t threads[5]; /// UN PROBLEMO SSS ACQUIIII
     t_table *table;
 
     //printf("%16lld %s\n", 100000000, "toto");  //has eaten  /  print propre  et ms affichage 
-
     int i = 0;
 	int ret;
     table = (t_table *)malloc(sizeof(t_table));
@@ -166,27 +178,24 @@ int main(int ac, char **av)
         return (ERROR); // mettre une erreur usage
     if (init_table(table) == ERROR)
         return (ERROR);
-    
-    //     //usleep(100*MILLISECOND);
-    // puts("BEFOOOORE");
-    // //detatch d'abord
-    // if ((pthread_detach(threads[0]) != 0))
-    //     return (ERROR);
-    // pthread_join(threads[0], NULL);
-    // puts("FREDO DEAD");
-
-
     // premier thread qui check la mort de tous les joueurs 
     while (i < table->nb_philo)
     {
         ret = pthread_create(&(threads[i]), NULL, ft_start, &(table->philo[i]));
         if (ret != 0)
             return (ERROR);
+        // ret = pthread_detach(threads[i]);
         usleep(MILLISECOND); // a verifier si ok ou pas
         i++;
-        pthread_detach(threads[i]);
     }
-    while (1){}
+    int death = pthread_create(&(threads[table->nb_philo + 1]), NULL, ft_check_death, table);
+    if (death != 0)
+        return (ERROR);
+    while (table->dead != table->nb_philo)
+    {
+        usleep(MILLISECOND);
+    }
+
     return (SUCCESS);
 }
 
