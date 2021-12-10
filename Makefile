@@ -1,12 +1,15 @@
 NAME	= philo
 
-SRC	=	main.c
-		##init.c	
+SRC	=	main.c \
+		time.c \
+		print_and_quit.c \
+		init.c	\
+		parse_and_start.c
 
 OBJ		= $(addprefix ./obj/,$(SRC:.c=.o))
 
-CC		= gcc
-CFLAGS	= -Wall -Wextra -Werror
+CC		= clang##gcc
+CFLAGS	= -Wall -Wextra -Werror #-g3 -Weverything
 
 LIBFTA	= ./Libft/Libft.a
 LIBINCL = -I./Libft/includes

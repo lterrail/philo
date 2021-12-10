@@ -29,20 +29,19 @@ typedef struct      s_philo
     int					id;
     pthread_mutex_t		*fork_left;
 	pthread_mutex_t		*fork_right;
-    pthread_mutex_t     *eats; /// a changer
     long long int       last_meal;
     struct s_table		*table;
 }					t_philo;
 
 typedef struct      s_table
 {
+    long long int	begin_time;
     t_philo			*philo;
     int				nb_philo;
     int				time_to_die;
     int				time_to_eat;
     int				time_to_sleep;
     int				time_to_think;
-    long long int	begin_time;
     int				must_eat;
     int				dead;
 	int				id_philo_who_just_died;
@@ -50,5 +49,20 @@ typedef struct      s_table
 
 }					t_table;
 
+// Time management
+long long int	get_time(void);
+long long int	elapsed_time(t_philo *philo);
+
+// Print messages and clean exit
+void	ft_print_msg(t_philo *philo, int i);
+void	ft_print_error(int err);
+void	ft_quit(t_table *table, int err);
+
+// Initialization
+int		init_table(t_table *table);
+
+// Parsing and start
+int		ft_parse_arg(char **av, int ac, t_table *table);
+void	*ft_start(void *void_philo);
 
 #endif
