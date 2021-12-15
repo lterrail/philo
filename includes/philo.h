@@ -15,6 +15,9 @@
 # define ERROR_MALLOC               -2
 # define ERROR_USAGE                -3
 
+// A supprimer : ?
+# define END_OF_GAME				9
+
 # define MILLISECOND                 1000
 # define NB_PHILO                    2
 

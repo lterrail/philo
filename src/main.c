@@ -1,21 +1,23 @@
 #include "philo.h"
 
-static void     *ft_check_death(void *void_table)
-{
-    t_table *table;
-    table = (t_table *)void_table;
-    while (1)
-    {
-		if (table->id_philo_who_just_died >= 0)
-		{
-			ft_print_msg(&(table->philo[table->id_philo_who_just_died]), PRINT_DIED);
-			table->id_philo_who_just_died = -1;
-			// ici quitter
-		}
-		if (table->dead == table->nb_philo)
-			return (NULL);
-    }
-}
+// static void     *ft_check_death(void *void_table)
+// {
+//     t_table *table;
+//     table = (t_table *)void_table;
+//     while (1)
+//     {
+// 		if (table->id_philo_who_just_died >= 0)
+// 		{
+// 			ft_print_msg(&(table->philo[table->id_philo_who_just_died]), PRINT_DIED);
+// 			table->id_philo_who_just_died = -1;
+// 			//return (NULL);
+// 			// ici quitter
+// 			//ft_quit(table, SUCCESS);
+// 		}
+// 		if (table->dead == table->nb_philo)
+// 			return (NULL);
+//     }
+// }
 
 int main(int ac, char **av)
 {
@@ -37,14 +39,20 @@ int main(int ac, char **av)
         usleep(MILLISECOND); // a verifier si ok ou pas
         i++;
     }
-    int death = pthread_create(&(table->threads[table->nb_philo]), NULL, ft_check_death, table);
-	if (death != 0)
-        return (ERROR);
-    while (table->dead != table->nb_philo) // > 0 arrete bien le jeu mais bouffe le print de mort
+    while (1)
     {
-        usleep(MILLISECOND);
+		if (table->id_philo_who_just_died >= 0)
+		{
+			ft_print_msg(&(table->philo[table->id_philo_who_just_died]), PRINT_DIED);
+			break ;
+		}
     }
-	ft_quit(table, SUCCESS);
+	//usleep(10000*MILLISECOND);
+	while (table->dead == table->nb_philo)
+	{
+		ft_quit(table, SUCCESS);
+		puts("neeeein");
+	}
     return (SUCCESS);
 }
 

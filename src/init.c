@@ -19,7 +19,7 @@ int init_table(t_table *table)
 
     if (!(table->philo = (t_philo *)malloc(sizeof(t_philo) * table->nb_philo)))
 		return (ERROR_MALLOC);
-	if (!(table->threads = (pthread_t *)malloc(sizeof(pthread_t) * (table->nb_philo + 1))))
+	if (!(table->threads = (pthread_t *)malloc(sizeof(pthread_t) * table->nb_philo)))
 		return (ERROR_MALLOC);
     table->dead = 0;
     while (++i < table->nb_philo)

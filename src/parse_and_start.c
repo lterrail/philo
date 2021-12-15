@@ -41,7 +41,7 @@ void    *ft_start(void *void_philo)
 	t_philo *philo;
     philo = (t_philo *)void_philo;
     philo->last_meal = 0;
-    while (get_time() >= (philo->table->time_to_die * MILLISECOND + philo->last_meal) && philo->table->must_eat) /////
+    while (get_time() >= (philo->table->time_to_die * MILLISECOND + philo->last_meal) && philo->table->must_eat)// && philo->table->dead == 0) /////
     {
         pthread_mutex_lock(philo->fork_right);
 		ft_print_msg(philo, PRINT_FORK); /////
@@ -62,6 +62,7 @@ void    *ft_start(void *void_philo)
 		ft_print_msg(philo, PRINT_THINK);
     }
     philo->table->dead++;
+    printf("dead : %d\n", philo->table->dead);
 	philo->table->id_philo_who_just_died = philo->id;
     return (NULL);
 }

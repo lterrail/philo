@@ -8,7 +8,7 @@ SRC	=	main.c \
 
 OBJ		= $(addprefix ./obj/,$(SRC:.c=.o))
 
-CC		= clang##gcc
+CC		= gcc##clang##gcc
 CFLAGS	= -Wall -Wextra -Werror #-g3 -Weverything
 
 LIBFTA	= ./Libft/Libft.a

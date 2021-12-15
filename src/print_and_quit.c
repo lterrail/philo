@@ -14,14 +14,17 @@
 
 void	ft_print_msg(t_philo *philo, int i)
 {
-	if (i == PRINT_FORK)
-		printf("%12lld ms  %d has taken a fork\n", elapsed_time(philo), philo->id);
-	if (i == PRINT_EAT)
-		printf("%12lld ms  %d is eating\n", elapsed_time(philo), philo->id);
-	if (i == PRINT_SLEEP)
-		printf("%12lld ms  %d is sleeping\n", elapsed_time(philo), philo->id);
-	if (i == PRINT_THINK)
-		printf("%12lld ms  %d is thinking\n", elapsed_time(philo), philo->id);
+	if (philo->table->dead <= 0)
+	{
+		if (i == PRINT_FORK)
+			printf("%12lld ms  %d has taken a fork\n", elapsed_time(philo), philo->id);
+		if (i == PRINT_EAT)
+			printf("%12lld ms  %d is eating\n", elapsed_time(philo), philo->id);
+		if (i == PRINT_SLEEP)
+			printf("%12lld ms  %d is sleeping\n", elapsed_time(philo), philo->id);
+		if (i == PRINT_THINK)
+			printf("%12lld ms  %d is thinking\n", elapsed_time(philo), philo->id);
+	}
 	if (i == PRINT_DIED)
 		printf("%12lld ms  %d died\n", elapsed_time(philo), philo->id);
 }
@@ -60,13 +63,13 @@ void ft_quit(t_table *table, int err)
 		if (table->threads)
 		{
 			i = -1;
-			while (++i <= table->nb_philo)
+			while (++i < table->nb_philo)
 			{
+				//	pthread_join(table->threads[i], NULL);
 				pthread_detach(table->threads[i]); ///leaks aleatoires :regarder les conditions detach precedentes car ne devaient pas etre validees
 			}
 			free(table->threads);
 		}
-
 		free(table);
 	}
 }
