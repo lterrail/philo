@@ -27,6 +27,8 @@ void	ft_print_msg(t_philo *philo, int i)
 	}
 	if (i == PRINT_DIED)
 		printf("%12lld ms  %d died\n", elapsed_time(philo), philo->id);
+	if (i == PRINT_END_OF_GAME)
+		printf("---------------End of game---------------\n");
 }
 
 void	ft_print_error(int err)

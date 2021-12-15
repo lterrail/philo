@@ -26,6 +26,7 @@
 # define PRINT_SLEEP                 2
 # define PRINT_THINK                 3
 # define PRINT_DIED                  4
+# define PRINT_END_OF_GAME			5
 
 typedef struct      s_philo
 {
@@ -44,10 +45,8 @@ typedef struct      s_table
     int				time_to_die;
     int				time_to_eat;
     int				time_to_sleep;
-    int				time_to_think;
     int				must_eat;
     int				dead;
-	int				id_philo_who_just_died;
 	pthread_t		*threads;
 
 }					t_table;

@@ -1,6 +1,30 @@
 #include "philo.h"
 
-static 
+static void ft_monitor(t_table *table)
+{
+	int i;
+
+	i = -1;
+    while (1)
+    {
+		while (++i < table->nb_philo)
+		{
+			if (get_time() - table->philo[i].last_meal >= table->time_to_die)
+			{
+				ft_print_msg(&(table->philo[i]), PRINT_DIED);
+				table->dead = 1;
+				return ;
+			}
+			if (table->must_eat <= 0)
+			{
+				ft_print_msg(&(table->philo[i]), PRINT_END_OF_GAME);
+				table->dead = 1;
+				return ;
+			}
+		}
+		i = -1;
+    }
+}
 
 int main(int ac, char **av)
 {
@@ -19,25 +43,16 @@ int main(int ac, char **av)
 		ret = pthread_create(&(table->threads[i]), NULL, ft_start, &(table->philo[i]));
 		if (ret != 0)
             return (ERROR);
-        usleep(MILLISECOND); // a verifier si ok ou pas
+        usleep(100); // a verifier si ok ou pas
         i++;
     }
-	ft_monitor(game);
+	ft_monitor(table);
     while (1)
-    {
-		if (table->id_philo_who_just_died >= 0)
-		{
-			ft_print_msg(&(table->philo[table->id_philo_who_just_died]), PRINT_DIED);
-			break ;
-		}
-    }
-	//usleep(10000*MILLISECOND);
-	while (table->dead == table->nb_philo)
 	{
-		ft_quit(table, SUCCESS);
-		puts("neeeein");
+		if (table->dead == table->nb_philo + 1)
+		{
+			ft_quit(table, SUCCESS);
+			return (SUCCESS);
+		}
 	}
-    return (SUCCESS);
 }
-
-// faire  une condition  d'arret  de jeu ( 1 philo dead)

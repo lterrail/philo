@@ -22,13 +22,13 @@ int init_table(t_table *table)
 	if (!(table->threads = (pthread_t *)malloc(sizeof(pthread_t) * table->nb_philo)))
 		return (ERROR_MALLOC);
     table->dead = 0;
+    table->begin_time = get_time();
     while (++i < table->nb_philo)
     {
         table->philo[i].id = i;
         table->philo[i].last_meal = table->begin_time;
         if (!(table->philo[i].fork_left = malloc(sizeof(pthread_mutex_t))))
             return (ERROR_MALLOC);
-
 		pthread_mutex_init(table->philo[i].fork_left, NULL);
 	}
 	i = -1;
@@ -44,8 +44,5 @@ int init_table(t_table *table)
 	{
         table->philo[i].table = table;
 	}
-	table->id_philo_who_just_died = -1;
-	table->begin_time = get_time();
-
     return (SUCCESS);
 }
