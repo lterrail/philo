@@ -44,7 +44,6 @@ int init_table(t_table *table)
 	{
         table->philo[i].table = table;
 	}
-	table->id_philo_who_just_died = -1;
 	table->begin_time = get_time();
 
     return (SUCCESS);

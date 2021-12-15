@@ -47,7 +47,6 @@ typedef struct      s_table
     int				time_to_think;
     int				must_eat;
     int				dead;
-	int				id_philo_who_just_died;
 	pthread_t		*threads;
 
 }					t_table;
