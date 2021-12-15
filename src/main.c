@@ -1,23 +1,6 @@
 #include "philo.h"
 
-// static void     *ft_check_death(void *void_table)
-// {
-//     t_table *table;
-//     table = (t_table *)void_table;
-//     while (1)
-//     {
-// 		if (table->id_philo_who_just_died >= 0)
-// 		{
-// 			ft_print_msg(&(table->philo[table->id_philo_who_just_died]), PRINT_DIED);
-// 			table->id_philo_who_just_died = -1;
-// 			//return (NULL);
-// 			// ici quitter
-// 			//ft_quit(table, SUCCESS);
-// 		}
-// 		if (table->dead == table->nb_philo)
-// 			return (NULL);
-//     }
-// }
+static 
 
 int main(int ac, char **av)
 {
@@ -39,6 +22,7 @@ int main(int ac, char **av)
         usleep(MILLISECOND); // a verifier si ok ou pas
         i++;
     }
+	ft_monitor(game);
     while (1)
     {
 		if (table->id_philo_who_just_died >= 0)

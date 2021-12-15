@@ -62,7 +62,7 @@ void    *ft_start(void *void_philo)
 		ft_print_msg(philo, PRINT_THINK);
     }
     philo->table->dead++;
-    printf("dead : %d\n", philo->table->dead);
+    //printf("dead : %d\n", philo->table->dead);
 	philo->table->id_philo_who_just_died = philo->id;
     return (NULL);
 }

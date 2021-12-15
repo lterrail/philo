@@ -65,8 +65,7 @@ void ft_quit(t_table *table, int err)
 			i = -1;
 			while (++i < table->nb_philo)
 			{
-				//	pthread_join(table->threads[i], NULL);
-				pthread_detach(table->threads[i]); ///leaks aleatoires :regarder les conditions detach precedentes car ne devaient pas etre validees
+				pthread_detach(table->threads[i]);
 			}
 			free(table->threads);
 		}
